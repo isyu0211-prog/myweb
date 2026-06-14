@@ -179,51 +179,51 @@ textarea::placeholder{color:#c0c0c0}
 
 <script>
 (function(){
-var dateEl=document.getElementById('dateEl');
-var moodRow=document.getElementById('moodRow');
-var input=document.getElementById('input');
-var entriesEl=document.getElementById('entries');
-var toast=document.getElementById('toast');
-var modal=document.getElementById('modal');
-var mDate=document.getElementById('mDate');
-var mMood=document.getElementById('mMood');
-var mContent=document.getElementById('mContent');
-var mood='☺️',editId=null;
+var dE=document.getElementById('dateEl');
+var mR=document.getElementById('moodRow');
+var inp=document.getElementById('input');
+var eEl=document.getElementById('entries');
+var toa=document.getElementById('toast');
+var mod=document.getElementById('modal');
+var mDa=document.getElementById('mDate');
+var mMo=document.getElementById('mMood');
+var mCo=document.getElementById('mContent');
+var mood='☺️',eid=null;
 
 function fmt(d){var a=['日','一','二','三','四','五','六'];var h=String(d.getHours()).padStart(2,'0');var m=String(d.getMinutes()).padStart(2,'0');return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+h+':'+m+' 星期'+a[d.getDay()];}
 function key(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function toast(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){toast.classList.remove('show');},1800);}
+function toast(msg){toa.textContent=msg;toa.classList.add('show');clearTimeout(toa._t);toa._t=setTimeout(function(){toa.classList.remove('show');},1800);}
 function all(){try{return JSON.parse(localStorage.getItem('d')||'[]');}catch(e){return[];}}
 function save(a){localStorage.setItem('d',JSON.stringify(a));}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
 function render(){
   var a=all();
-  if(!a.length){entriesEl.innerHTML='<div class="empty">还没有日记</div>';return;}
-  entriesEl.innerHTML=a.slice().reverse().map(function(d){return'<div class="entry" onclick="view(\''+d.id+'\')"><button class="entry-del" onclick="event.stopPropagation();del(\''+d.id+'\')">✕</button><div class="entry-head"><span class="entry-date">'+(d.ds||d.date)+'</span><span class="entry-mood">'+(d.mood||'📝')+'</span></div><div class="entry-text">'+esc(d.text)+'</div></div>';}).join('');
+  if(!a.length){eEl.innerHTML='<div class="empty">还没有日记</div>';return;}
+  eEl.innerHTML=a.slice().reverse().map(function(d){return'<div class="entry" onclick="view(\''+d.id+'\')"><button class="entry-del" onclick="event.stopPropagation();del(\''+d.id+'\')">✕</button><div class="entry-head"><span class="entry-date">'+(d.ds||d.date)+'</span><span class="entry-mood">'+(d.mood||'📝')+'</span></div><div class="entry-text">'+esc(d.text)+'</div></div>';}).join('');
 }
 
 function saveDiary(){
-  var t=input.value.trim();
-  if(!t){toast('请先写点什么');input.focus();return;}
+  var t=inp.value.trim();
+  if(!t){toast('请先写点什么');inp.focus();return;}
   var n=new Date();
-  var d={id:editId||Date.now().toString(),date:key(),ds:fmt(n),time:n.toISOString(),mood:mood,text:t};
+  var d={id:eid||Date.now().toString(),date:key(),ds:fmt(n),time:n.toISOString(),mood:mood,text:t};
   var a=all();
-  if(editId){a=a.map(function(x){return x.id===editId?d:x;});editId=null;}else{a.push(d);}
-  save(a);input.value='';mood='☺️';updateMood();render();toast('已保存');
+  if(eid){a=a.map(function(x){return x.id===eid?d:x;});eid=null;}else{a.push(d);}
+  save(a);inp.value='';mood='☺️';updateMood();render();toast('已保存');
 }
 
-function clearDiary(){input.value='';editId=null;mood='☺️';updateMood();input.focus();toast('已清空');}
+function clearDiary(){inp.value='';eid=null;mood='☺️';updateMood();inp.focus();toast('已清空');}
 
 function updateMood(){
-  moodRow.querySelectorAll('.mood').forEach(function(b){b.classList.toggle('on',b.dataset.m===mood);});
+  mR.querySelectorAll('.mood').forEach(function(b){b.classList.toggle('on',b.dataset.m===mood);});
 }
 
 function loadToday(){
   var tk=key();
   var a=all();
   var t=a.find(function(d){return d.date===tk;});
-  if(t){input.value=t.text;mood=t.mood||'😊';editId=t.id;}else{input.value='';mood='☺️';editId=null;}
+  if(t){inp.value=t.text;mood=t.mood||'☺️';eid=t.id;}else{inp.value='';mood='☺️';eid=null;}
   updateMood();
 }
 
@@ -231,8 +231,8 @@ window.view=function(id){
   var a=all();
   var d=a.find(function(x){return x.id===id;});
   if(!d)return;
-  mDate.textContent=d.ds||d.date;mMood.textContent=d.mood||'📝';mContent.textContent=d.text;
-  modal.classList.add('show');document.body.style.overflow='hidden';
+  mDa.textContent=d.ds||d.date;mMo.textContent=d.mood||'📝';mCo.textContent=d.text;
+  mod.classList.add('show');document.body.style.overflow='hidden';
 };
 
 window.del=function(id){
@@ -240,20 +240,20 @@ window.del=function(id){
   var a=all();a=a.filter(function(d){return d.id!==id;});save(a);render();toast('已删除');
 };
 
-function closeModal(){modal.classList.remove('show');document.body.style.overflow='';}
+function closeModal(){mod.classList.remove('show');document.body.style.overflow='';}
 
-dateEl.textContent=fmt(new Date());
+dE.textContent=fmt(new Date());
 
-moodRow.addEventListener('click',function(e){var b=e.target.closest('.mood');if(!b)return;mood=b.dataset.m;updateMood();});
+mR.addEventListener('click',function(e){var b=e.target.closest('.mood');if(!b)return;mood=b.dataset.m;updateMood();});
 document.getElementById('btnSave').addEventListener('click',saveDiary);
 document.getElementById('btnClear').addEventListener('click',clearDiary);
 document.getElementById('mClose').addEventListener('click',closeModal);
-modal.addEventListener('click',function(e){if(e.target===modal)closeModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){if(document.activeElement===input){e.preventDefault();saveDiary();}}});
+mod.addEventListener('click',function(e){if(e.target===mod)closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){if(document.activeElement===inp){e.preventDefault();saveDiary();}}});
 
 var ts=0;
-modal.addEventListener('touchstart',function(e){ts=e.touches[0].clientY;});
-modal.addEventListener('touchmove',function(e){if(e.touches[0].clientY-ts>60)closeModal();});
+mod.addEventListener('touchstart',function(e){ts=e.touches[0].clientY;});
+mod.addEventListener('touchmove',function(e){if(e.touches[0].clientY-ts>60)closeModal();});
 
 updateMood();loadToday();render();
 })();
