@@ -164,6 +164,11 @@ textarea::placeholder{color:#bcc5cd}
   <button class="btn btn-save" id="btnSave">保存</button>
   <button class="btn btn-clear" id="btnClear">清空</button>
 </div>
+<div class="btns" style="margin-top:6px">
+  <button class="btn btn-clear" id="btnExport">📥 导出备份</button>
+  <button class="btn btn-clear" id="btnImport">📤 导入恢复</button>
+</div>
+<input type="file" id="importFile" accept=".json" style="display:none">
 
 <div class="list" id="list">
   <div class="list-title">过往</div>
@@ -250,6 +255,40 @@ dE.textContent=fmt(new Date());
 mR.addEventListener('click',function(e){var b=e.target.closest('.mood');if(!b)return;mood=b.dataset.m;updateMood();});
 document.getElementById('btnSave').addEventListener('click',saveDiary);
 document.getElementById('btnClear').addEventListener('click',clearDiary);
+
+// 导出备份
+document.getElementById('btnExport').addEventListener('click',function(){
+  var a=all();
+  if(!a.length){toast('没有可导出的内容');return;}
+  var blob=new Blob([JSON.stringify(a,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var el=document.createElement('a');
+  el.href=url;el.download='my-diary-backup.json';
+  el.click();URL.revokeObjectURL(url);
+  toast('备份已下载 ✅');
+});
+
+// 导入恢复
+document.getElementById('btnImport').addEventListener('click',function(){
+  document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change',function(e){
+  var file=e.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(!Array.isArray(data))throw new Error();
+      var a=all();
+      data.forEach(function(d){a.push(d);});
+      save(a);render();toast('已导入 '+data.length+' 条');
+    }catch(ex){toast('文件格式错误');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+
 document.getElementById('mClose').addEventListener('click',closeModal);
 mod.addEventListener('click',function(e){if(e.target===mod)closeModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){if(document.activeElement===inp){e.preventDefault();saveDiary();}}});
